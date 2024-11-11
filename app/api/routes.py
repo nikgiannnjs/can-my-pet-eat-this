@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from app.db import connection
-from app.db.queries import CREATE_PETS_TABLE, INSERT_NEW_PET
+from app.db.queries import INSERT_NEW_PET
 from app.utils import valid_user
 
 pet_bp = Blueprint('pets' , __name__)
@@ -24,15 +24,10 @@ def insert_pet(id):
             pet_weight = data["pet_weight"]
             animal_id = data["animal_id"]
    
-
-            try:
-                cursor.execute(CREATE_PETS_TABLE)
-                cursor.execute(INSERT_NEW_PET , (pet_name, pet_weight, user_id, animal_id,))
-                pet_id = cursor.fetchone()[0]
-                return {"id": pet_id, "message": "New pet succesfully added."}, 201
-            except Exception as e:
-                print(f"Error at /newpet endpoint:{e}")
-                return {"message": "Failed to add new pet. Try again later."}, 500
+            cursor.execute(INSERT_NEW_PET , (pet_name, pet_weight, user_id, animal_id,))
+            pet_id = cursor.fetchone()[0]
+            return {"id": pet_id, "message": "New pet succesfully added."}, 201
+        
 
 
     
