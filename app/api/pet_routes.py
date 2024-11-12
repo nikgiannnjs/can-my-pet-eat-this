@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify 
 from app.db import connection
 from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET
-from app.utils import valid_user
+from app.utils import valid_user, formater
 
 pet_bp = Blueprint('pets' , __name__)
 
@@ -23,8 +23,16 @@ def insert_pet(id):
             pet_name = data["pet_name"]
             pet_weight = data["pet_weight"]
             animal_id = data["animal_id"]
+
+            valid_pet_name = formater(pet_name)
+
+            cursor.execute("SELECT * FROM pets WHERE user_id = %s AND name = %s AND animal_id = %s", (user_id , valid_pet_name, animal_id))
+            pet_exists = cursor.fetchone()
+
+            if pet_exists:
+                return jsonify({"message": "Pet already exist."}), 400
    
-            cursor.execute(INSERT_NEW_PET , (pet_name, pet_weight, user_id, animal_id,))
+            cursor.execute(INSERT_NEW_PET , (valid_pet_name, pet_weight, user_id, animal_id,))
             pet_id = cursor.fetchone()[0]
 
             if not pet_id:

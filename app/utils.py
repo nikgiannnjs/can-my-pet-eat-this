@@ -6,3 +6,8 @@ def valid_user(user_id):
             result = cursor.fetchone()
 
             return result
+        
+def formater(pet_name):
+      formatted_name = pet_name.strip().capitalize()
+
+      return formatted_name
