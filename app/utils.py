@@ -1,4 +1,3 @@
-from flask import request
 from app.db import connection
 
 def valid_user(user_id):
