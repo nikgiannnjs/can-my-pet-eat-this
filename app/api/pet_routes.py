@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify 
 from app.db import connection
-from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET
+from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET
 from app.utils import valid_user, formater
+from collections import OrderedDict
 
 pet_bp = Blueprint('pets' , __name__)
 
@@ -93,16 +94,49 @@ def delete_pet(id):
                 return jsonify({"message": f"Failed to delete pet with id:{pet_id}"}), 404
             
             return jsonify({"message": "Pet deleted succesfully."}), 201
+
+@pet_bp.route('/update_pet_info/<int:id>', methods=['PATCH'])
+def update_pet_info(id):
+    data = request.get_json()
+    user_id = id
+    
+    with connection:
+        with connection.cursor() as cursor:
+            is_user_valid = valid_user(user_id)
+
+            if not is_user_valid:
+                return jsonify({"message": "User does not exist."}), 400
             
+            if not data or not all(key in data for key in("pet_name", "pet_weight", "animal_id")):
+                return jsonify({"message": "Missing data. Bad request."}), 400 
             
+            pet_id = data["id"]
+            new_pet_name = formater(data["pet_name"])
+            new_pet_weight = data["pet_weight"]
+            new_animal_id = data["animal_id"]
 
+            cursor.execute(UPDATE_PET, (new_pet_name, new_pet_weight, new_animal_id, pet_id, user_id))
+            update_result = cursor.fetchone()[0]
+
+            if not update_result:
+                return jsonify({"message": "Failed to update pet information."}), 404
+            
+            cursor.execute('SELECT * FROM pets WHERE id = %s' , (update_result,))
+            find_pet_result = cursor.fetchone()
+
+            if not find_pet_result:
+                return jsonify({"message": "Failed to find pet after update."}), 404      
+
+            new_pet = {
+                "id": find_pet_result[0],
+                "name": find_pet_result[1],
+                "weight": find_pet_result[2],
+                "user_id": find_pet_result[3],
+                "animal_id": find_pet_result[4],
+                "created_at": find_pet_result[5]
+            } 
+            
+            print(new_pet)
+            return jsonify({"message": "Pet updated successfully.", "new_pet": new_pet}), 200
         
-    
 
-    
-
-
-        
-
-
-    

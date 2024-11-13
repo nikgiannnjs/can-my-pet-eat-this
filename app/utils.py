@@ -7,7 +7,7 @@ def valid_user(user_id):
 
             return result
         
-def formater(pet_name):
-      formatted_name = pet_name.strip().capitalize()
+def formater(to_fix):
+      formatted = to_fix.strip().capitalize()
 
-      return formatted_name
+      return formatted
