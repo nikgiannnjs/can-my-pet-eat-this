@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify
 from app.db import connection
 from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET
 from app.utils import valid_user, formater
-from collections import OrderedDict
 
 pet_bp = Blueprint('pets' , __name__)
 
@@ -136,7 +135,6 @@ def update_pet_info(id):
                 "created_at": find_pet_result[5]
             } 
             
-            print(new_pet)
             return jsonify({"message": "Pet updated successfully.", "new_pet": new_pet}), 200
         
 
