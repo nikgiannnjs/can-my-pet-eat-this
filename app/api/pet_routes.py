@@ -137,4 +137,19 @@ def update_pet_info(id):
             
             return jsonify({"message": "Pet updated successfully.", "new_pet": new_pet}), 200
         
+@pet_bp.route('/is_edible/<int:id>', methods=['GET'])
+def can_eat_that(id):
+    data = request.get_json()
+    user_id = id
 
+    is_user_valid = valid_user(user_id)
+
+    if not is_user_valid:
+                return jsonify({"message": "User does not exist."}), 400
+    
+    if not data or not all(key in data for key in("pet_id")):
+                return jsonify({"message": "Missing data. Bad request."}), 400 
+    
+    with connection:
+        with connection.cursor() as cursor:
+             pet_id = data["pet_id"]
