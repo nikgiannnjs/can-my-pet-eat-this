@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify 
 from app.db import connection
-from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET
+from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET, CAN_EAT_THAT, EDIBILITY_NOTE
 from app.utils import valid_user, formater
 
 pet_bp = Blueprint('pets' , __name__)
@@ -136,7 +136,7 @@ def update_pet_info(id):
             } 
             
             return jsonify({"message": "Pet updated successfully.", "new_pet": new_pet}), 200
-        
+
 @pet_bp.route('/is_edible/<int:id>', methods=['GET'])
 def can_eat_that(id):
     data = request.get_json()
@@ -145,11 +145,46 @@ def can_eat_that(id):
     is_user_valid = valid_user(user_id)
 
     if not is_user_valid:
-                return jsonify({"message": "User does not exist."}), 400
+        return jsonify({"message": "User does not exist."}), 400
     
-    if not data or not all(key in data for key in("pet_id")):
-                return jsonify({"message": "Missing data. Bad request."}), 400 
+    if not data or not all(key in data for key in ("pet_id", "food_id")):
+        return jsonify({"message": "Missing data. Bad request."}), 400 
     
     with connection:
         with connection.cursor() as cursor:
-             pet_id = data["pet_id"]
+            pet_id = data["pet_id"]
+            food_id = data["food_id"]
+
+            cursor.execute('SELECT name FROM pets WHERE id = %s', (pet_id,))
+            pet_name = cursor.fetchone()
+            if not pet_name:
+                return jsonify({"message": "Pet does not exist."}), 400
+            pet_name = pet_name[0]
+            
+            cursor.execute('SELECT name FROM foods WHERE id = %s', (food_id,))
+            food_name = cursor.fetchone()
+            if not food_name:
+                return jsonify({"message": "Food does not exist."}), 400
+            food_name = food_name[0]
+
+            cursor.execute('SELECT animal_id FROM pets WHERE id = %s', (pet_id,))
+            animal_id = cursor.fetchone()
+            if not animal_id:
+                return jsonify({"message": "Animal does not exist."}), 400
+            animal_id = animal_id[0] 
+
+            cursor.execute(CAN_EAT_THAT, (food_id, animal_id))
+            can_eat = cursor.fetchone()
+            if not can_eat:
+                return jsonify({"message": "Edibility data does not exist."}), 400
+            can_eat = can_eat[0]
+
+            cursor.execute(EDIBILITY_NOTE, (food_id, animal_id))
+            note = cursor.fetchone()
+            note = note[0] 
+
+            if can_eat == True:
+                return jsonify({"message": f"Yes. {pet_name} can eat {food_name}. {note}"})
+            else:
+                return jsonify({"message": f"{pet_name} cannot eat {food_name}. {note}"})
+

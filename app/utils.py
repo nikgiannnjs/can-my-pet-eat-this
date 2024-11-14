@@ -1,4 +1,5 @@
 from app.db import connection
+from flask import jsonify
 
 def valid_user(user_id):
         with connection.cursor() as cursor:
