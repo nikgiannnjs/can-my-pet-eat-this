@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, jsonify
 from app.db import connection
 from app.api.pet_routes import pet_bp
+from app.utils import NotFoundError
 
 def create_app():
     app = Flask(__name__)
@@ -12,5 +13,9 @@ def create_app():
     def global_server_error_handler(error):
         app.logger.error(f"Unexpected error:{error}")
         return{"message": "Unexpected error occured. Please try again later."}, 500
+    
+    @app.errorhandler(NotFoundError)
+    def not_found_error_response(e):
+        return jsonify({"message": e.message}), 400
 
     return app
