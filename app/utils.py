@@ -13,11 +13,13 @@ def valid_user(user_id):
                 raise NotFoundError({"message": "User does not exist."})
             
 def missing_data(data, required_fields):
-     if not data or not all(key in data for key in required_fields):
-                raise NotFoundError ({"message": "Missing data. Bad request."}) 
+     if not data:
+          raise NotFoundError({"message": "Empty body. Bad request."})
      
+     missing_data = [key for key in required_fields if key not in data]
 
-            
+     if missing_data:
+                raise NotFoundError(f"Missing data. The following fields are required: {', '.join(missing_data)}")     
         
 def formater(to_fix):
       formatted = to_fix.strip().capitalize()

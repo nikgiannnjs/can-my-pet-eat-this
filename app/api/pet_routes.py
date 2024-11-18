@@ -136,7 +136,7 @@ def can_eat_that(id):
         with connection.cursor() as cursor:
             required = ["pet_id" , "food_id"]
             missing_data(data, required)
-            
+
             pet_id = data["pet_id"]
             food_id = data["food_id"]
             
@@ -158,3 +158,5 @@ def can_eat_that(id):
                 return jsonify({"message": f"Yes. {pet_name} can eat {food_name}. {note}"})
             else:
                 return jsonify({"message": f"{pet_name} cannot eat {food_name}. {note}"})
+            
+#admins_only: add animals, update animals, delete animals

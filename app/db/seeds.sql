@@ -9,6 +9,7 @@ CREATE TABLE users (
     email VARCHAR(250) UNIQUE NOT NULL,
     password_hash VARCHAR(250) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  
+    password_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 
 CREATE TABLE pets(

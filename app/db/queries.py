@@ -4,3 +4,4 @@ DELETE_PET ="DELETE FROM pets WHERE id = %s AND user_id = %s"
 UPDATE_PET = 'UPDATE pets SET name = %s, weight = %s, animal_id = %s WHERE id = %s AND user_id = %s RETURNING id'
 CAN_EAT_THAT = 'SELECT can_eat FROM edibility WHERE food_id = %s AND animal_id = %s'
 EDIBILITY_NOTE = 'SELECT notes FROM edibility WHERE food_id = %s AND animal_id = %s'
+USER_REGISTER = 'INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s) RETURNING id'
