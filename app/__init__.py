@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from app.db import connection
 from app.api.pet_routes import pet_bp
 from app.api.users_routes import users_bp
-from app.utils import NotFoundError
+from app.utils import NotFoundError, InvalidPasswordError, DuplicateEmailError
 
 def create_app():
     app = Flask(__name__)
@@ -20,6 +20,14 @@ def create_app():
     
     @app.errorhandler(NotFoundError)
     def not_found_error_response(e):
+        return jsonify({"message": e.message}), 400
+    
+    @app.errorhandler(InvalidPasswordError)
+    def invalid_password_error_response(e):
+        return jsonify({"message": e.message}), 400
+    
+    @app.errorhandler(DuplicateEmailError)
+    def duplicate_email_error_response(e):
         return jsonify({"message": e.message}), 400
 
     return app

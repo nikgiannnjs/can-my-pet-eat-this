@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify
 from app.db import connection
 import bcrypt
 from app.db.queries import USER_REGISTER
-from app.utils import valid_user, formater, if_exists, missing_data
+from app.utils import valid_user, formater, if_exists, missing_data, valid_password
 
 users_bp = Blueprint('users' , __name__)
 
@@ -25,6 +25,8 @@ def user_register():
 
     if password != password_confirm:
         return jsonify({"message": "Password and password confirmation, are not the same."})
+    
+    valid_password(password)
     
     password_hash = bcrypt.hashpw(password.encode('utf-8') , bcrypt.gensalt())
 

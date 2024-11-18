@@ -1,9 +1,5 @@
 from app.db import connection
 
-class NotFoundError(Exception):
-    def __init__(self, message):
-        self.message = message
-
 def valid_user(user_id):
         with connection.cursor() as cursor:
             cursor.execute('SELECT * FROM users WHERE id = %s', (user_id,))
@@ -12,6 +8,7 @@ def valid_user(user_id):
             if not result:
                 raise NotFoundError({"message": "User does not exist."})
             
+
 def missing_data(data, required_fields):
      if not data:
           raise NotFoundError({"message": "Empty body. Bad request."})
@@ -21,10 +18,16 @@ def missing_data(data, required_fields):
      if missing_data:
                 raise NotFoundError(f"Missing data. The following fields are required: {', '.join(missing_data)}")     
         
+
 def formater(to_fix):
       formatted = to_fix.strip().capitalize()
 
       return formatted
+
+
+class NotFoundError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 def if_exists(column, table, index, key):
       with connection.cursor() as cursor: 
@@ -35,3 +38,44 @@ def if_exists(column, table, index, key):
             raise NotFoundError(f"{key} does not exist.")
             
        return result[0]
+      
+
+class InvalidPasswordError(Exception):
+    def __init__(self, message):
+        self.message = message
+      
+def valid_password(password):
+     has_upper = False
+     has_lower = False
+     has_number = False
+     has_special_char = False
+     has_length = False
+
+     special_characters = ["!","@","#","$","%","^","&","*","(",")"]
+
+     for char in password:
+          if char.islower():
+               has_lower = True
+
+     for char in password:
+          if char.isupper():
+               has_upper = True
+            
+     for char in password:
+          if char.isdigit():
+               has_number = True
+
+     for char in password:
+          if char in special_characters:
+               has_special_char = True
+
+     if len(password) >= 8:
+          has_length = True
+          
+
+     if not (has_lower and has_upper and has_number and has_special_char and has_length):
+          raise InvalidPasswordError({"message": "Password needs to be at least 8 characters and have at least one uppercase letter, one lowercase letter, one number and one special character."})
+   
+
+
+              
