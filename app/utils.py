@@ -77,5 +77,15 @@ def valid_password(password):
           raise InvalidPasswordError({"message": "Password needs to be at least 8 characters and have at least one uppercase letter, one lowercase letter, one number and one special character."})
    
 
+class DuplicateEmailError(Exception):
+    def __init__(self, message):
+        self.message = message
 
+def email_is_unique(email):
+     with connection.cursor() as cursor:
+          cursor.execute('SELECT * FROM users WHERE email = %s' , (email,))
+          result = cursor.fetchone()
+
+          if result:
+               raise DuplicateEmailError({"message": "This email already exists."})
               
