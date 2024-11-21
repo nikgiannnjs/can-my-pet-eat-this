@@ -25,8 +25,7 @@ def user_register():
 
     valid_password(password)
     email_is_unique(email)
-    valid_email_format(email)
-  
+    valid_email_format(email) 
 
     if password != password_confirm:
         return jsonify({"message": "Password and password confirmation, are not the same."})
