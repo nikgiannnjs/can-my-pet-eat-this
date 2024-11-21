@@ -2,11 +2,6 @@ from flask import jsonify
 from app.utils.utils import NotFoundError, InvalidPasswordError, DuplicateEmailError, WrongEmailFormatError, DuplicateUsernameError
 
 def error_handling(app):
-
-    @app.errorhandler(Exception)
-    def global_server_error_handler(error):
-        app.logger.error(f"Unexpected error:{error}")
-        return{"message": "Unexpected error occured. Please try again later."}, 500
     
     @app.errorhandler(NotFoundError)
     def not_found_error_response(e):
