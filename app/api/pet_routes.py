@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify 
 from app.db import connection
 from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET, CAN_EAT_THAT, EDIBILITY_NOTE
-from app.utils import valid_user, formater, if_exists, missing_data
+from app.utils.utils import valid_user, formater, if_exists, missing_data
 
 pet_bp = Blueprint('pets' , __name__)
 

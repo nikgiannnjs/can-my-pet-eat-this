@@ -1,4 +1,5 @@
 from app.db import connection
+from app.utils.custom_exceptions import *
 import re
 
 def valid_user(user_id):
@@ -25,11 +26,6 @@ def formater(to_fix):
 
       return formatted
 
-
-class NotFoundError(Exception):
-    def __init__(self, message):
-        self.message = message
-
 def if_exists(column, table, index, key):
       with connection.cursor() as cursor: 
        query = f'SELECT {column} FROM {table} WHERE id = %s'
@@ -39,12 +35,7 @@ def if_exists(column, table, index, key):
             raise NotFoundError(f"{key} does not exist.")
             
        return result[0]
-      
-
-class InvalidPasswordError(Exception):
-    def __init__(self, message):
-        self.message = message
-      
+          
 def valid_password(password):
      has_upper = False
      has_lower = False
@@ -77,11 +68,6 @@ def valid_password(password):
      if not (has_lower and has_upper and has_number and has_special_char and has_length):
           raise InvalidPasswordError({"message": "Password needs to be at least 8 characters and have at least one uppercase letter, one lowercase letter, one number and one special character."})
    
-
-class DuplicateEmailError(Exception):
-    def __init__(self, message):
-        self.message = message
-
 def email_is_unique(email):
      with connection.cursor() as cursor:
           cursor.execute('SELECT * FROM users WHERE email = %s' , (email,))
@@ -90,11 +76,6 @@ def email_is_unique(email):
           if result:
                raise DuplicateEmailError({"message": "This email already exists."})
 
-
-class WrongEmailFormatError(Exception):
-     def __init__(self, message):
-          self.message = message
-          
 def valid_email_format(email):
      regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
@@ -103,6 +84,13 @@ def valid_email_format(email):
      if not validation:
           raise WrongEmailFormatError({"mssage": "Wrong email format."})
 
+def duplicate_username(username):
+     with connection.cursor() as cursor:
+          cursor.execute('SELECT * FROM users WHERE username = %s' , (username,))
+          result = cursor.fetchone()
+
+          if result:
+               raise DuplicateUsernameError({"message": "User name already exists."})
 
 
               
