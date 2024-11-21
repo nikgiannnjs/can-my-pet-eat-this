@@ -1,4 +1,5 @@
 from app.db import connection
+import re
 
 def valid_user(user_id):
         with connection.cursor() as cursor:
@@ -88,4 +89,20 @@ def email_is_unique(email):
 
           if result:
                raise DuplicateEmailError({"message": "This email already exists."})
+
+
+class WrongEmailFormatError(Exception):
+     def __init__(self, message):
+          self.message = message
+          
+def valid_email_format(email):
+     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+
+     validation = re.fullmatch(regex, email)
+
+     if not validation:
+          raise WrongEmailFormatError({"mssage": "Wrong email format."})
+
+
+
               

@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify
 from app.db import connection
 import bcrypt
 from app.db.queries import USER_REGISTER
-from app.utils import valid_user, formater, if_exists, missing_data, valid_password, email_is_unique
+from app.utils import valid_user, formater, if_exists, missing_data, valid_password, email_is_unique, valid_email_format
 
 users_bp = Blueprint('users' , __name__)
 
@@ -20,11 +20,13 @@ def user_register():
     last_name = formater(data["last_name"])
     username = first_name + " " + last_name
     email = data["email"]
-    password = data["password"] #fix utility function for valid password
+    password = data["password"]
     password_confirm = data["password_confirm"]
 
     valid_password(password)
     email_is_unique(email)
+    valid_email_format(email)
+  
 
     if password != password_confirm:
         return jsonify({"message": "Password and password confirmation, are not the same."})
