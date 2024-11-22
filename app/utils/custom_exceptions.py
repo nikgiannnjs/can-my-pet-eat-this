@@ -17,3 +17,7 @@ class WrongEmailFormatError(Exception):
 class DuplicateUsernameError(Exception):
      def __init__(self, message):
           self.message = message
+
+class NotFoundInDbError(Exception):
+    def __init__(self, message):
+          self.message = message

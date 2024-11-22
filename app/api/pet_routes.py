@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify 
 from app.db import connection
 from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET, CAN_EAT_THAT, EDIBILITY_NOTE
-from app.utils.utils import valid_user, formater, if_exists, missing_data
+from app.utils.utils import valid_user, formater, if_exists, missing_data, not_found_in_db
 
 pet_bp = Blueprint('pets' , __name__)
 
@@ -27,7 +27,7 @@ def insert_pet(id):
             pet_exists = cursor.fetchone()
 
             if pet_exists:
-                return jsonify({"message": "Pet already exist."}), 400
+                return jsonify({"message": "Pet already exists."}), 400
    
             cursor.execute(INSERT_NEW_PET , (valid_pet_name, pet_weight, user_id, animal_id,))
             pet_id = cursor.fetchone()[0]
@@ -76,6 +76,8 @@ def delete_pet(id):
 
             missing_data(data, required)           
             pet_id = data["pet_id"]
+
+            not_found_in_db(pet_id , "pets" , "id" , "Pet id")
 
             cursor.execute(DELETE_PET, (pet_id, user_id,))
             result = cursor.rowcount

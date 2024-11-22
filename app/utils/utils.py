@@ -92,5 +92,13 @@ def duplicate_username(username):
           if result:
                raise DuplicateUsernameError({"message": "User name already exists."})
 
+def not_found_in_db(index , table, column , key):
+     query = f'SELECT * FROM {table} WHERE {column} = %s'
+     with connection.cursor() as cursor:
+          cursor.execute(query , (index,))
+          result = cursor.fetchone()
+
+          if not result:
+               raise NotFoundInDbError({"message": f"{key} could not be found in db."})
 
               

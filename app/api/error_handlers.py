@@ -1,5 +1,5 @@
 from flask import jsonify
-from app.utils.utils import NotFoundError, InvalidPasswordError, DuplicateEmailError, WrongEmailFormatError, DuplicateUsernameError
+from app.utils.utils import NotFoundError, InvalidPasswordError, DuplicateEmailError, WrongEmailFormatError, DuplicateUsernameError, NotFoundInDbError
 
 def error_handling(app):
     
@@ -21,4 +21,8 @@ def error_handling(app):
     
     @app.errorhandler(DuplicateUsernameError)
     def duplicate_username_error_response(e):
+        return jsonify({"message": e.message}), 400
+    
+    @app.errorhandler(NotFoundInDbError)
+    def not_found_in_db_error_response(e):
         return jsonify({"message": e.message}), 400
