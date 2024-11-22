@@ -1,4 +1,4 @@
-#login, logout, forgot_pass, change_pass, change_user_info, terms of service acceptance
+#logout, forgot_pass, change_pass, change_user_info, terms of service acceptance
 #admins_only: get all users, update_user, delete_user
 
 from flask import Blueprint, request, jsonify
