@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from app.db import connection
 import os
+import datetime
 from dotenv import load_dotenv
 from flask_jwt_extended import JWTManager
 from app.api.pet_routes import pet_bp
@@ -13,6 +14,7 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
     app.config["JWT_SECRET_KEY"] = os.getenv("MY_JWT_SECRET_KEY")
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
     JWTManager(app)
 
     from app.api.pet_routes import pet_bp

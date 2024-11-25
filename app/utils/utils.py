@@ -100,5 +100,7 @@ def not_found_in_db(index , table, column , key):
 
           if not result:
                raise NotFoundInDbError({"message": f"{key} could not be found in db."})
+          
+
 
               

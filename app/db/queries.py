@@ -6,3 +6,5 @@ CAN_EAT_THAT = 'SELECT can_eat FROM edibility WHERE food_id = %s AND animal_id =
 EDIBILITY_NOTE = 'SELECT notes FROM edibility WHERE food_id = %s AND animal_id = %s'
 USER_REGISTER = 'INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s) RETURNING id'
 USER_LOGIN = 'SELECT password_hash FROM users WHERE id = %s AND username = %s AND email = %s'
+GET_HASHED_PASSWORD = 'SELECT password_hash FROM users WHERE id = %s'
+CHANGE_PASSWORD = 'UPDATE users SET password_hash = %s , password_updated_at = CURRENT_TIMESTAMP WHERE id = %s RETURNING id'
