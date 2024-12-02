@@ -1,10 +1,13 @@
-#forgot_pass, change_pass, change_user_info, terms of service acceptance
+#change_user_info, terms of service acceptance
 #admins_only: get all users, update_user, delete_user
 
 from flask import Blueprint, request, jsonify
 from app.db import connection
 import bcrypt
-from flask_jwt_extended import create_access_token
+import os
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+from flask_mail import Message
 from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD
 from app.utils.utils import valid_user, formater, missing_data, valid_password, email_is_unique, valid_email_format, duplicate_username,not_found_in_db
 
@@ -129,6 +132,83 @@ def change_password(id):
                 return jsonify({"message": "Could not update password."}), 404
             
             return jsonify({"message": "Password updated successfully."}), 200
+
+@users_bp.route('/forgot_password/<int:id>' , methods=['POST'])
+def forgot_password(id):
+    from app import mail
+    data = request.get_json()
+    user_id = id
+
+    valid_user(user_id)
+
+    required = ['email']
+    missing_data(data , required)
+
+    user_email = data["email"]
+
+    not_found_in_db(user_email , "users" , "email" , "Email")
+
+    token = create_access_token(identity=str(user_id), additional_claims={"user_id": user_id})
+    print(f"TOKEN{token}")
+
+    print(f"Generated token: {token}") 
+
+    reset_password_url = f"http://127.0.0.1:5000/users/reset_password/{token}"
+
+    msg = Message(
+            subject = "Requested Reset Password",
+            sender = os.getenv("MAILTRAP_SENDER"),
+            #sender = os.getenv("EMAIL_USERNAME"),
+            recipients = [user_email],
+            body = f"Click on the link to reset your password {reset_password_url}"
+        )
+
+    mail.send(msg)
+
+    return jsonify({"message": "Password reset email sent."})
+        
+@users_bp.route("/reset_password/<token>", methods=['POST'])
+@jwt_required()
+def reset_password(token):
+    try:
+     user_id = get_jwt_identity()  
+    except ExpiredSignatureError:
+        return jsonify({"message": "Token has expired. Request a new password reset."})
+    except InvalidTokenError:
+        return jsonify({"message": "Invalid token. Please request a valid password reset token."})
+
+    data = request.get_json()
+
+    required = ["new_password" , "new_password_confirmation"]
+    missing_data(data , required)
+
+    with connection:
+        with connection.cursor() as cursor:
+            new_password = data["new_password"]
+            new_password_confirmation = data["new_password_confirmation"]
+
+            if new_password != new_password_confirmation:
+                return jsonify({"message": "Password and password confirmation are not the same."}), 400
+    
+            valid_password(new_password)
+
+            new_password_encryption = bcrypt.hashpw(new_password.encode('utf-8') , bcrypt.gensalt())
+            new_password_hash = new_password_encryption.decode('utf-8')
+
+            cursor.execute(CHANGE_PASSWORD , (new_password_hash , user_id,))
+            password_update_result = cursor.fetchone()
+
+            if not password_update_result:
+                return jsonify({"message": "Could not reset password."}), 404
+            
+            return jsonify({"message": "Password reset successfully."}), 200
+
+
+
+
+
+
+
 
 
 

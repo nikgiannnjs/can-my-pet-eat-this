@@ -3,3 +3,4 @@ python-dotenv
 psycopg2-binary
 bcrypt
 flask-jwt-extended
+Flask-Mail
