@@ -8,5 +8,6 @@ USER_REGISTER = 'INSERT INTO users (username, email, password_hash) VALUES (%s, 
 USER_LOGIN = 'SELECT password_hash FROM users WHERE id = %s AND username = %s AND email = %s'
 GET_HASHED_PASSWORD = 'SELECT password_hash FROM users WHERE id = %s'
 CHANGE_PASSWORD = 'UPDATE users SET password_hash = %s , password_updated_at = CURRENT_TIMESTAMP WHERE id = %s RETURNING id'
-UPDATE_USERNAME ='UPDATE users SET username = %s WHERE id = %s RETURNING id'
-UPDATE_USER_EMAIL ='UPDATE users SET email = %s WHERE id = %s RETURNING id'
+UPDATE_USERNAME = 'UPDATE users SET username = %s WHERE id = %s RETURNING id'
+UPDATE_USER_EMAIL = 'UPDATE users SET email = %s WHERE id = %s RETURNING id'
+INSERT_TOS_ACCEPTANCE_STATUS = 'INSERT INTO tos_acceptance(user_id , tos_id, accepted_at) VALUES(%s , %s, CURRENT_TIMESTAMP) RETURNING id'

@@ -1,4 +1,3 @@
-#change_user_email, terms of service acceptance
 #admins_only: get all users, update_user, delete_user
 
 from flask import Blueprint, request, jsonify
@@ -8,7 +7,7 @@ import os
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_mail import Message
-from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL
+from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL, INSERT_TOS_ACCEPTANCE_STATUS
 from app.utils.utils import valid_user, formater, missing_data, valid_password, email_is_unique, valid_email_format, duplicate_username,not_found_in_db
 
 users_bp = Blueprint('users' , __name__)
@@ -17,8 +16,8 @@ users_bp = Blueprint('users' , __name__)
 def user_register():
     data = request.get_json()
 
-    required = ["first_name" , "last_name" , "email" , "password" , "password_confirm"]
-    missing_data(data, required)
+    required_fields = ["first_name" , "last_name" , "email" , "password" , "password_confirm"]
+    missing_data(data, required_fields)
 
     first_name = formater(data["first_name"])
     last_name = formater(data["last_name"])
@@ -55,8 +54,8 @@ def user_login(id):
     valid_user(id)
     user_id = id
 
-    required = ["first_name" , "last_name" , "email" , "password"]
-    missing_data(data , required)
+    required_fields = ["first_name" , "last_name" , "email" , "password"]
+    missing_data(data , required_fields)
     first_name = formater(data["first_name"])
     last_name = formater(data["last_name"])
     username = first_name + " " + last_name
@@ -94,8 +93,8 @@ def change_password(id):
 
     valid_user(user_id)
 
-    required = ["old_password" , "new_password" , "new_password_confirmation"]
-    missing_data(data , required)
+    required_fields = ["old_password" , "new_password" , "new_password_confirmation"]
+    missing_data(data , required_fields)
 
     old_password = data["old_password"]
     new_password = data["new_password"]
@@ -141,8 +140,8 @@ def forgot_password(id):
 
     valid_user(user_id)
 
-    required = ['email']
-    missing_data(data , required)
+    required_fields = ['email']
+    missing_data(data , required_fields)
 
     user_email = data["email"]
 
@@ -179,8 +178,8 @@ def reset_password(token):
 
     data = request.get_json()
 
-    required = ["new_password" , "new_password_confirmation"]
-    missing_data(data , required)
+    required_fields = ["new_password" , "new_password_confirmation"]
+    missing_data(data , required_fields)
 
     with connection:
         with connection.cursor() as cursor:
@@ -209,8 +208,8 @@ def change_user_name(id):
     valid_user(id)
     user_id = id
 
-    required = ["first_name" , "last_name"]
-    missing_data(data , required)
+    required_fields = ["first_name" , "last_name"]
+    missing_data(data , required_fields)
 
     first_name = formater(data["first_name"])
     last_name = formater(data["last_name"])
@@ -234,8 +233,8 @@ def change_user_email(id):
     valid_user(id)
     user_id = id
 
-    required = ["email"]
-    missing_data(data , required)
+    required_fields = ["email"]
+    missing_data(data , required_fields)
     email = data ["email"]
 
     email_is_unique(email)
@@ -250,6 +249,46 @@ def change_user_email(id):
                 return jsonify({"message": "Could not update user email."}), 400
             
             return jsonify({"message": "User email updated successfully."}), 201
+
+@users_bp.route("/tos_acceptance/<int:id>" , methods=["POST"])
+def tos_acceptance(id):
+    data = request.get_json()
+    valid_user(id)
+    user_id = id
+
+    required_fields = ["version" , "status"]
+    missing_data(data , required_fields)
+
+    version = data["version"]
+    status = data["status"]
+
+    if status not in [True, False]:
+      return jsonify({"message": "Invalid status. Must be true or false."}), 400
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT id FROM terms_of_service WHERE version = %s' , (version,))
+            result = cursor.fetchone()
+
+            if not result:
+                return jsonify({"message": "ToS version not found."}), 404
+            
+            version_id = result[0]
+
+            if not status:
+                return jsonify({"message": "Please accept the ToS."}), 400
+            
+            cursor.execute(INSERT_TOS_ACCEPTANCE_STATUS , (user_id , version_id,))
+            tos_result = cursor.fetchone()
+
+            if not tos_result:
+                return jsonify({"message": "Could not update ToS status."}), 404
+            
+            return jsonify({"message": "ToS status updated succesfully."}), 201
+            
+
+
+
 
 
 

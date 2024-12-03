@@ -34,6 +34,20 @@ CREATE TABLE edibility(
     notes VARCHAR(500)
 )
 
+CREATE TABLE terms_of_service (
+    id SERIAL PRIMARY KEY,
+    version VARCHAR(50),
+    content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE tos_acceptance (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    tos_id INT REFERENCES terms_of_service(id),
+    accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+);
+
 --animals table seed
 INSERT INTO animals (name) VALUES 
 ('dog'),
@@ -84,3 +98,7 @@ INSERT INTO edibility (food_id, animal_id, can_eat, notes) VALUES
 (5, 4, FALSE, 'Birds cannot eat onions, toxic to them'),
 (5, 5, FALSE, 'Frogs cannot eat onions, toxic to them'),
 (5, 6, FALSE, 'Turtles cannot eat onions, toxic to them');
+
+--terms_of_service seed
+INSERT INTO terms_of_service (version, content) VALUES
+('1.1' , 'Welcome to Can My Pet Eat That. By accessing or using our service, you agree to our terms and conditions')
