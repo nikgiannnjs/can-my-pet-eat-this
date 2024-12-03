@@ -9,3 +9,4 @@ USER_LOGIN = 'SELECT password_hash FROM users WHERE id = %s AND username = %s AN
 GET_HASHED_PASSWORD = 'SELECT password_hash FROM users WHERE id = %s'
 CHANGE_PASSWORD = 'UPDATE users SET password_hash = %s , password_updated_at = CURRENT_TIMESTAMP WHERE id = %s RETURNING id'
 UPDATE_USERNAME ='UPDATE users SET username = %s WHERE id = %s RETURNING id'
+UPDATE_USER_EMAIL ='UPDATE users SET email = %s WHERE id = %s RETURNING id'

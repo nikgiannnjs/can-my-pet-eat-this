@@ -1,4 +1,4 @@
-#change_user_name, change_user_email terms of service acceptance
+#change_user_email, terms of service acceptance
 #admins_only: get all users, update_user, delete_user
 
 from flask import Blueprint, request, jsonify
@@ -8,7 +8,7 @@ import os
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_mail import Message
-from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME
+from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL
 from app.utils.utils import valid_user, formater, missing_data, valid_password, email_is_unique, valid_email_format, duplicate_username,not_found_in_db
 
 users_bp = Blueprint('users' , __name__)
@@ -227,6 +227,30 @@ def change_user_name(id):
                 return jsonify({"message": "Could not update username."}), 400
             
             return jsonify({"message": "Username updated succesfully."}), 201
+
+@users_bp.route("/change_user_email/<int:id>" , methods=["POST"])
+def change_user_email(id):
+    data = request.get_json()
+    valid_user(id)
+    user_id = id
+
+    required = ["email"]
+    missing_data(data , required)
+    email = data ["email"]
+
+    email_is_unique(email)
+    valid_email_format(email)
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(UPDATE_USER_EMAIL , (email, user_id,))
+            result = cursor.fetchone()
+
+            if not result:
+                return jsonify({"message": "Could not update user email."}), 400
+            
+            return jsonify({"message": "User email updated successfully."}), 201
+
 
 
 
