@@ -42,11 +42,23 @@ CREATE TABLE terms_of_service (
 );
 
 CREATE TABLE tos_acceptance (
-    id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id),
     tos_id INT REFERENCES terms_of_service(id),
     accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id , tos_id)
 );
+"""
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE user_roles (
+    user_id INT REFERENCES users(id),
+    role_id INT REFERENCES roles(id),
+    PRIMARY KEY (user_id, role_id)
+);
+"""
 
 --animals table seed
 INSERT INTO animals (name) VALUES 

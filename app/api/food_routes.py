@@ -1,1 +1,1 @@
-#Admins only: Add food, change food name, change edibility notes
+#Veterinarians only: Add food, Delete food, Update food, Update edibility combinations, Update edibility notes

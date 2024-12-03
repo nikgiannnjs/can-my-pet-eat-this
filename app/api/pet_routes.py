@@ -1,3 +1,6 @@
+#admins_only: add animals, update animals, delete animals
+#Premium users only: extra food edibility combinations
+
 from flask import Blueprint, request, jsonify 
 from app.db import connection
 from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET, CAN_EAT_THAT, EDIBILITY_NOTE
@@ -161,4 +164,3 @@ def can_eat_that(id):
             else:
                 return jsonify({"message": f"{pet_name} cannot eat {food_name}. {note}"})
             
-#admins_only: add animals, update animals, delete animals
