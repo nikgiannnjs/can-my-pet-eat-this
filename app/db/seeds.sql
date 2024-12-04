@@ -118,3 +118,7 @@ INSERT INTO terms_of_service (version, content) VALUES
 --roles seed
 INSERT INTO roles (name) VALUES 
 ('common user' , 'admin' , 'veterinarian')
+
+--Manual admin role seed
+INSERT INTO user_roles (user_id , role_id) VALUES
+(your_user_id , admin_id)

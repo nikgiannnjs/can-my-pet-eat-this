@@ -7,7 +7,8 @@ import os
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_mail import Message
-from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL, INSERT_TOS_ACCEPTANCE_STATUS, INSERT_USER_ROLE
+from app.utils.middlewares import admin_check
+from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL, INSERT_TOS_ACCEPTANCE_STATUS, INSERT_USER_ROLE , GET_COMMON_USER_ROLE_ID, GET_ADMIN_ROLE_ID
 from app.utils.utils import valid_user, formater, missing_data, valid_password, email_is_unique, valid_email_format, duplicate_username,not_found_in_db
 
 users_bp = Blueprint('users' , __name__)
@@ -45,7 +46,7 @@ def user_register():
             if not user_id:
                 return jsonify({"message": "Failed to register user."}), 500
             
-            cursor.execute('SELECT id FROM roles WHERE name = %s' , ('common user',))
+            cursor.execute( GET_COMMON_USER_ROLE_ID , ('common user',))
             user_role_id = cursor.fetchone()
 
             if not user_role_id:
@@ -57,9 +58,9 @@ def user_register():
             role_assignment = cursor.fetchone()
 
             if not role_assignment:
-                return jsonify({"message": "Role assignement failed."}), 400
+                return jsonify({"message": "Role assignment failed."}), 400
             
-            return jsonify({"message": "User registered successfully."}), 201
+            return jsonify({"message": "Role assigned. User registered successfully."}), 201
    
 @users_bp.route('/login/<int:id>' , methods=['POST'])
 def user_login(id):
@@ -96,7 +97,7 @@ def user_login(id):
             if not comparison:
                 return jsonify({"message": "Invalid password."}), 400
             
-            token = create_access_token(identity=user_id)
+            token = create_access_token(identity=str(user_id), additional_claims={"user_id": user_id})
             
             return jsonify({"messsage": "Login successfull." , "access_token": token}), 200
         
@@ -300,6 +301,36 @@ def tos_acceptance(id):
             
             return jsonify({"message": "ToS status updated succesfully."}), 201
             
+@users_bp.route('/assign_admin_role' , methods=["POST"])
+@admin_check
+def assign_admin():
+    data = request.get_json()
+
+    required_fields = ["user_id"]
+    missing_data(data , required_fields)
+
+    user_id = data["user_id"]
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_ADMIN_ROLE_ID , ("admin",))
+            result = cursor.fetchone()
+
+            if not result:
+                return jsonify({"message": "Admin id not found."}), 400
+            
+            admin_id = result[0]
+
+            cursor.execute(INSERT_USER_ROLE, (user_id , admin_id,))
+            admin_result = cursor.fetchone()
+
+            if not admin_result:
+                return jsonify({"message": "Admin role not assigned."}), 404
+            
+            return jsonify({"message": "Admin role assigned succesfully."}), 201
+
+
+
 
 
 
