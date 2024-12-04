@@ -1,4 +1,4 @@
-#admins_only: get all users, update_user, delete_user
+#admins_only: get all users, update_user, delete_user, modify_user_roles
 
 from flask import Blueprint, request, jsonify
 from app.db import connection
@@ -7,7 +7,7 @@ import os
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_mail import Message
-from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL, INSERT_TOS_ACCEPTANCE_STATUS
+from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL, INSERT_TOS_ACCEPTANCE_STATUS, INSERT_USER_ROLE
 from app.utils.utils import valid_user, formater, missing_data, valid_password, email_is_unique, valid_email_format, duplicate_username,not_found_in_db
 
 users_bp = Blueprint('users' , __name__)
@@ -45,7 +45,21 @@ def user_register():
             if not user_id:
                 return jsonify({"message": "Failed to register user."}), 500
             
-            return jsonify({"message": "User registered successfully." , "id": f"{user_id}"}), 201
+            cursor.execute('SELECT id FROM roles WHERE name = %s' , ('common user',))
+            user_role_id = cursor.fetchone()
+
+            if not user_role_id:
+                return jsonify({"message": "User role not found."}), 404
+            
+            role_id = user_role_id[0]
+
+            cursor.execute(INSERT_USER_ROLE , (user_id , role_id))
+            role_assignment = cursor.fetchone()
+
+            if not role_assignment:
+                return jsonify({"message": "Role assignement failed."}), 400
+            
+            return jsonify({"message": "User registered successfully."}), 201
    
 @users_bp.route('/login/<int:id>' , methods=['POST'])
 def user_login(id):

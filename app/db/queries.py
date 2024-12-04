@@ -11,3 +11,4 @@ CHANGE_PASSWORD = 'UPDATE users SET password_hash = %s , password_updated_at = C
 UPDATE_USERNAME = 'UPDATE users SET username = %s WHERE id = %s RETURNING id'
 UPDATE_USER_EMAIL = 'UPDATE users SET email = %s WHERE id = %s RETURNING id'
 INSERT_TOS_ACCEPTANCE_STATUS = 'INSERT INTO tos_acceptance(user_id , tos_id, accepted_at) VALUES(%s , %s, CURRENT_TIMESTAMP) RETURNING accepted_at'
+INSERT_USER_ROLE = 'INSERT INTO user_roles (user_id , role_id) VALUES (%s , %s) RETURNING user_id'

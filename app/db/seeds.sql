@@ -47,7 +47,7 @@ CREATE TABLE tos_acceptance (
     accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id , tos_id)
 );
-"""
+
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL
@@ -58,7 +58,7 @@ CREATE TABLE user_roles (
     role_id INT REFERENCES roles(id),
     PRIMARY KEY (user_id, role_id)
 );
-"""
+
 
 --animals table seed
 INSERT INTO animals (name) VALUES 
@@ -114,3 +114,7 @@ INSERT INTO edibility (food_id, animal_id, can_eat, notes) VALUES
 --terms_of_service seed
 INSERT INTO terms_of_service (version, content) VALUES
 ('1.1' , 'Welcome to Can My Pet Eat That. By accessing or using our service, you agree to our terms and conditions')
+
+--roles seed
+INSERT INTO roles (name) VALUES 
+('common user' , 'admin' , 'veterinarian')
