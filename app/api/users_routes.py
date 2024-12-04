@@ -8,7 +8,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_mail import Message
 from app.utils.middlewares import admin_check
-from app.db.queries import USER_REGISTER, USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL, INSERT_TOS_ACCEPTANCE_STATUS, INSERT_USER_ROLE , GET_COMMON_USER_ROLE_ID, GET_ADMIN_ROLE_ID
+from app.db.queries import USER_REGISTER, GET_ALL_USERS , USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL, INSERT_TOS_ACCEPTANCE_STATUS, INSERT_USER_ROLE , GET_COMMON_USER_ROLE_ID, GET_ADMIN_ROLE_ID
 from app.utils.utils import valid_user, formater, missing_data, valid_password, email_is_unique, valid_email_format, duplicate_username,not_found_in_db
 
 users_bp = Blueprint('users' , __name__)
@@ -335,7 +335,30 @@ def assign_admin():
             
             return jsonify({"message": "Admin role assigned succesfully."}), 201
 
+@users_bp.route('/get_all_users' , methods=['GET'])
+@admin_check
+def get_all_users():
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_ALL_USERS , ())
+            result = cursor.fetchall()
 
+            print(result)
+
+            if not result:
+                return jsonify({"message": "Users not found."}), 404
+            
+            users = [
+                {
+                "username": user[1],
+                "email": user[2],
+                "created_at": user[4]
+            }for user in result
+            ]
+
+            print(users[0])
+
+            return jsonify({"users": users}), 200
 
 
 

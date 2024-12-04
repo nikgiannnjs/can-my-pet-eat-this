@@ -14,3 +14,4 @@ INSERT_TOS_ACCEPTANCE_STATUS = 'INSERT INTO tos_acceptance(user_id , tos_id, acc
 GET_COMMON_USER_ROLE_ID = 'SELECT id FROM roles WHERE name = %s'
 INSERT_USER_ROLE = 'INSERT INTO user_roles (user_id , role_id) VALUES (%s , %s) RETURNING user_id'
 GET_ADMIN_ROLE_ID = 'SELECT id FROM roles WHERE name = %s'
+GET_ALL_USERS = 'SELECT * FROM users'
