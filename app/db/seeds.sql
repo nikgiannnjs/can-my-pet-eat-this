@@ -42,8 +42,8 @@ CREATE TABLE terms_of_service (
 );
 
 CREATE TABLE tos_acceptance (
-    user_id INT REFERENCES users(id),
-    tos_id INT REFERENCES terms_of_service(id),
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    tos_id INT REFERENCES terms_of_service(id) ON DELETE CASCADE,
     accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id , tos_id)
 );
@@ -54,8 +54,8 @@ CREATE TABLE roles (
 );
 
 CREATE TABLE user_roles (
-    user_id INT REFERENCES users(id),
-    role_id INT REFERENCES roles(id),
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    role_id INT REFERENCES roles(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, role_id)
 );
 

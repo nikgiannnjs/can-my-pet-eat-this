@@ -88,7 +88,7 @@ def delete_pet(id):
             if not result:
                 return jsonify({"message": f"Failed to delete pet with id:{pet_id}"}), 404
             
-            return jsonify({"message": "Pet deleted succesfully."}), 201
+            return jsonify({"message": "Pet deleted succesfully."}), 204
 
 @pet_bp.route('/update_pet_info/<int:id>', methods=['PATCH'])
 def update_pet_info(id):
