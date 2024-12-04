@@ -321,6 +321,12 @@ def assign_admin():
             
             admin_id = result[0]
 
+            cursor.execute('SELECT * FROM user_roles WHERE user_id = %s AND role_id = %s' , (user_id , admin_id,))
+            already_admin = cursor.fetchone()
+
+            if already_admin:
+                return jsonify({"message": "Already an admin."}), 400
+
             cursor.execute(INSERT_USER_ROLE, (user_id , admin_id,))
             admin_result = cursor.fetchone()
 
