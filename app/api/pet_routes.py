@@ -177,6 +177,11 @@ def add_animals():
 
     with connection:
         with connection.cursor() as cursor:
+            cursor.execute('SELECT name FROM animals WHERE name = %s' , (animal_name,))
+            existence_check_result = cursor.fetchone()
+
+            if existence_check_result:
+                return jsonify({"message": "Animal already exists."}), 400
 
             cursor.execute(ADD_ANIMAL , (animal_name,))
             result = cursor.fetchone()
@@ -184,4 +189,4 @@ def add_animals():
             if not result:
                 return jsonify({"message": "Failed to add animal."}), 400
             
-            return jsonify({"message": "Animal added succesfully."})
+            return jsonify({"message": "Animal added succesfully."}), 201
