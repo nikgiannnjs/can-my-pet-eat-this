@@ -8,7 +8,7 @@ from app.utils.utils import missing_data
 def admin_check(f):
     @wraps(f)
     @jwt_required()
-    def coded_function(*args, **kwargs):
+    def wrapped_admin_function(*args, **kwargs):
         try:
          user_id = get_jwt_identity()  
         except ExpiredSignatureError:
@@ -33,12 +33,12 @@ def admin_check(f):
                     return jsonify({"message": "Access denied."}), 403
                 
         return f(*args, **kwargs)
-    return coded_function
+    return wrapped_admin_function
 
 def veterinarian_check(f):
-   wraps(f)
-   @jwt_required()
-   def coded_function(*args , **kwargs):
+    @wraps(f)
+    @jwt_required()
+    def wrapped_vet_function(*args, **kwargs):
         try:
          user_id = get_jwt_identity()  
         except ExpiredSignatureError:
@@ -63,7 +63,7 @@ def veterinarian_check(f):
                     return jsonify({"message": "Access denied."}), 403
         
         return f(*args, **kwargs)
-   return coded_function
+    return wrapped_vet_function
                 
 
 

@@ -1,10 +1,10 @@
-#Veterinarians only: Add food, Delete food, Update food, Update edibility combinations, Update edibility notes
+#Veterinarians only: Delete food, Update food, Update edibility combinations, Update edibility notes
 
 from flask import Blueprint, request, jsonify 
 from app.db import connection
 from app.utils.utils import formater, if_exists, missing_data, not_found_in_db
-from app.utils.middlewares import veterinarian_check, admin_check
-from app.db.queries import ADD_FOOD, GET_VET_ROLE_ID, INSERT_USER_ROLE
+from app.utils.middlewares import veterinarian_check
+from app.db.queries import ADD_FOOD, UPDATE_FOOD
 
 food_bp = Blueprint('foods' , __name__)
 
@@ -35,4 +35,26 @@ def add_food():
             
             return jsonify({"message": "Food added successfully."}), 201
 
+@food_bp.route('/update_food/<int:id>' , methods=["POST"])
+@veterinarian_check
+def update_food(id):
+    data = request.get_json()
+    food_id = id
+
+    required_fields = ["food_name"]
+    missing_data(data, required_fields)
+
+    food_name = formater(data["food_name"])
+
+    not_found_in_db(food_id, "foods" , "id" , "Food id")
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(UPDATE_FOOD , (food_name, food_id,))
+            result = cursor.fetchone()
+
+            if not result:
+                return jsonify({"message": "Failed to update food."}), 400
+            
+            return jsonify({"message": "Food updated successfully."}), 201
 
