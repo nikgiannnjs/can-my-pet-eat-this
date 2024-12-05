@@ -1,8 +1,8 @@
-#Veterinarians only: Delete food, Update food, Update edibility combinations, Update edibility notes
+#Veterinarians only: Delete food, get all foods, Update edibility combinations, Update edibility notes
 
 from flask import Blueprint, request, jsonify 
 from app.db import connection
-from app.utils.utils import formater, if_exists, missing_data, not_found_in_db
+from app.utils.utils import formater, missing_data, not_found_in_db
 from app.utils.middlewares import veterinarian_check
 from app.db.queries import ADD_FOOD, UPDATE_FOOD
 
@@ -40,13 +40,12 @@ def add_food():
 def update_food(id):
     data = request.get_json()
     food_id = id
+    not_found_in_db(food_id, "foods" , "id" , "Food id")
 
     required_fields = ["food_name"]
     missing_data(data, required_fields)
 
     food_name = formater(data["food_name"])
-
-    not_found_in_db(food_id, "foods" , "id" , "Food id")
 
     with connection:
         with connection.cursor() as cursor:
