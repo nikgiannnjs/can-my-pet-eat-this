@@ -1,4 +1,3 @@
-#admins_only: delete animals
 #Premium users only: extra food edibility combinations
 
 from flask import Blueprint, request, jsonify 

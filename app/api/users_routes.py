@@ -329,9 +329,9 @@ def assign_admin():
             admin_result = cursor.fetchone()
 
             if not admin_result:
-                return jsonify({"message": "Admin role not assigned."}), 404
+                return jsonify({"message": "Failed to assigne role."}), 404
             
-            return jsonify({"message": "Admin role assigned succesfully."}), 201
+            return jsonify({"message": "Role assigned succesfully."}), 201
 
 @users_bp.route('/get_all_users' , methods=['GET'])
 @admin_check

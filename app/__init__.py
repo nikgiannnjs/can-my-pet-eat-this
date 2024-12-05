@@ -34,9 +34,11 @@ def create_app():
 
     from app.api.pet_routes import pet_bp
     from app.api.users_routes import users_bp
+    from app.api.food_routes import food_bp
     
     app.register_blueprint(pet_bp , url_prefix='/my_pets')
     app.register_blueprint(users_bp, url_prefix='/users')
+    app.register_blueprint(food_bp, url_prefix='/foods')
 
     global_error_handling(app)
     error_handling(app)

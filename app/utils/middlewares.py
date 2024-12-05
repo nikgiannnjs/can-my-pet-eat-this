@@ -35,6 +35,36 @@ def admin_check(f):
         return f(*args, **kwargs)
     return coded_function
 
+def veterinarian_check(f):
+   wraps(f)
+   @jwt_required()
+   def coded_function(*args , **kwargs):
+        try:
+         user_id = get_jwt_identity()  
+        except ExpiredSignatureError:
+         return jsonify({"message": "Token has expired. Request a new password reset."})
+        except InvalidTokenError:
+         return jsonify({"message": "Invalid token. Please request a valid password reset token."})
+
+        with connection:
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT id FROM roles WHERE name = %s' , ("veterinarian",))
+                result = cursor.fetchone()
+
+                if not result:
+                    return jsonify({"message": "Veterinarian id not found."})
+                
+                vet_id = result[0]
+
+                cursor.execute('SELECT * FROM user_roles WHERE user_id = %s AND role_id = %s' , (user_id , vet_id,))
+                result = cursor.fetchone()
+
+                if not result:
+                    return jsonify({"message": "Access denied."}), 403
+        
+        return f(*args, **kwargs)
+   return coded_function
+                
 
 
 
