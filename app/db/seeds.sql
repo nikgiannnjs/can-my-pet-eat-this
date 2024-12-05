@@ -62,20 +62,20 @@ CREATE TABLE user_roles (
 
 --animals table seed
 INSERT INTO animals (name) VALUES 
-('dog'),
-('cat'),
-('rabbit'),
-('bird'),
-('frog'),
-('turtle')
+('Dog'),
+('Cat'),
+('Rabbit'),
+('Bird'),
+('Frog'),
+('Turtle')
 
 --foods table seed
 INSERT INTO foods (name) VALUES 
-('apple'),
-('banana'),
-('carrot'),
-('chocolate'),
-('onions')
+('Apple'),
+('Banana'),
+('Carrot'),
+('Chocolate'),
+('Onions')
 
 
 --edibility table seed

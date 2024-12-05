@@ -1,5 +1,3 @@
-#admins_only: delete_user, modify_user_roles
-
 from flask import Blueprint, request, jsonify
 from app.db import connection
 import bcrypt

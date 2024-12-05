@@ -3,8 +3,9 @@
 
 from flask import Blueprint, request, jsonify 
 from app.db import connection
-from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET, CAN_EAT_THAT, EDIBILITY_NOTE
+from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET, CAN_EAT_THAT, EDIBILITY_NOTE, ADD_ANIMAL
 from app.utils.utils import valid_user, formater, if_exists, missing_data, not_found_in_db
+from app.utils.middlewares import admin_check
 
 pet_bp = Blueprint('pets' , __name__)
 
@@ -164,3 +165,23 @@ def can_eat_that(id):
             else:
                 return jsonify({"message": f"{pet_name} cannot eat {food_name}. {note}"})
             
+@pet_bp.route('/add_animals' , methods=['POST'])
+@admin_check
+def add_animals():
+    data = request.get_json()
+
+    required_fields = ["animal_name"]
+    missing_data(data ,required_fields)
+
+    animal_name = formater(data["animal_name"])
+
+    with connection:
+        with connection.cursor() as cursor:
+
+            cursor.execute(ADD_ANIMAL , (animal_name,))
+            result = cursor.fetchone()
+
+            if not result:
+                return jsonify({"message": "Failed to add animal."}), 400
+            
+            return jsonify({"message": "Animal added succesfully."})

@@ -16,3 +16,4 @@ INSERT_USER_ROLE = 'INSERT INTO user_roles (user_id , role_id) VALUES (%s , %s) 
 GET_ADMIN_ROLE_ID = 'SELECT id FROM roles WHERE name = %s'
 GET_ALL_USERS = 'SELECT * FROM users'
 DELETE_USER = 'DELETE FROM users WHERE id = %s'
+ADD_ANIMAL = 'INSERT INTO animals(name) VALUES(%s) RETURNING id'
