@@ -380,7 +380,35 @@ def delete_user():
             
             return jsonify({"message": "User delete succesfylly."}), 204
 
+@users_bp.route('/assign_role' , methods=["POST"])
+@admin_check
+def assign_role():
+    data = request.get_json()
 
+    required_fields = ["user_id" , "role_id"]
+    missing_data(data , required_fields)
+
+    user_id = data["user_id"]
+    role_id = data["role_id"]
+
+    valid_user(user_id)
+    not_found_in_db(role_id , "roles" , "id" , "Role id")
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT * FROM user_roles WHERE user_id = %s AND role_id = %s' , (user_id , role_id,))
+            already_admin = cursor.fetchone()
+
+            if already_admin:
+                return jsonify({"message": "Already an admin."}), 400
+
+            cursor.execute(INSERT_USER_ROLE, (user_id , role_id,))
+            admin_result = cursor.fetchone()
+
+            if not admin_result:
+                return jsonify({"message": "Failed to assign role."}), 404
+            
+            return jsonify({"message": "Role assigned succesfully."}), 201
 
 
 
