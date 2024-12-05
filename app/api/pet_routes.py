@@ -1,9 +1,9 @@
-#admins_only: add animals, update animals, delete animals
+#admins_only: update animals, delete animals
 #Premium users only: extra food edibility combinations
 
 from flask import Blueprint, request, jsonify 
 from app.db import connection
-from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET, CAN_EAT_THAT, EDIBILITY_NOTE, ADD_ANIMAL
+from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET, CAN_EAT_THAT, EDIBILITY_NOTE, ADD_ANIMAL, UPDATE_ANIMAL
 from app.utils.utils import valid_user, formater, if_exists, missing_data, not_found_in_db
 from app.utils.middlewares import admin_check
 
@@ -190,3 +190,27 @@ def add_animals():
                 return jsonify({"message": "Failed to add animal."}), 400
             
             return jsonify({"message": "Animal added succesfully."}), 201
+
+@pet_bp.route('/update_animals/<int:id>' , methods=['POST'])
+@admin_check
+def update_animals(id):
+    data = request.get_json()
+    animal_id = id
+
+    required_fields = ["new_animal_name"]
+    missing_data(data ,required_fields)
+
+    new_animal_name = formater(data["new_animal_name"])
+
+    not_found_in_db(animal_id , "animals" , "id" , "Animal id")
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(UPDATE_ANIMAL , (new_animal_name, animal_id,))
+            result = cursor.fetchone()
+
+            if not result:
+                return jsonify({"message": "Failed to update animal."}), 404
+            
+            return jsonify({"message": "Animal updated successsfully."}), 201
+

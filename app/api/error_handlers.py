@@ -26,3 +26,5 @@ def error_handling(app):
     @app.errorhandler(NotFoundInDbError)
     def not_found_in_db_error_response(e):
         return jsonify(e.message), 400
+    
+    
