@@ -16,11 +16,17 @@ def add_food():
     required_fields = ["food_name"]
     missing_data(data , required_fields)
 
-    food_name = data["food_name"]
+    food_name = formater(data["food_name"])
 
     with connection:
         with connection.cursor() as cursor:
 
+            cursor.execute('SELECT * FROM foods WHERE name = %s' , (food_name,))
+            if_exists_result = cursor.fetchone()
+
+            if if_exists_result:
+                return jsonify({"message": "Food already exists."}), 400 
+        
             cursor.execute(ADD_FOOD , (food_name,))
             result = cursor.fetchone()
 
