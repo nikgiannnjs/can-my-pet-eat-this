@@ -341,8 +341,6 @@ def get_all_users():
             cursor.execute(GET_ALL_USERS , ())
             result = cursor.fetchall()
 
-            print(result)
-
             if not result:
                 return jsonify({"message": "Users not found."}), 404
             
@@ -353,8 +351,6 @@ def get_all_users():
                 "created_at": user[4]
             }for user in result
             ]
-
-            print(users[0])
 
             return jsonify({"users": users}), 200
 

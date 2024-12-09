@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 from app.db import connection
 from app.utils.utils import formater, missing_data, not_found_in_db
 from app.utils.middlewares import veterinarian_check
-from app.db.queries import ADD_FOOD, UPDATE_FOOD, DELETE_FOOD
+from app.db.queries import ADD_FOOD, UPDATE_FOOD, DELETE_FOOD, GET_ALL_FOODS
 
 food_bp = Blueprint('foods' , __name__)
 
@@ -74,6 +74,25 @@ def delete_food(id):
             
             return jsonify({"message": "Food deleted successfully."}), 200
             
+@food_bp.route('/get_all_foods', methods=["GET"])
+@veterinarian_check
+def get_all_foods():
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(GET_ALL_FOODS, ())
+            result = cursor.fetchall()
+
+            if not result:
+                return jsonify({"message": "Failed to get all foods."}), 404
+            
+            foods = [
+                {
+                    "name": food[1],
+                    "created_at": food[2]
+            }for food in result
+            ]
+
+            return jsonify({"foods": foods}), 200
 
 
 
