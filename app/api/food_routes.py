@@ -1,10 +1,10 @@
-#Veterinarians only: Update edibility, Delete edibility, Get all edibilities
+#Veterinarians only: Delete edibility, Get all edibilities
 
 from flask import Blueprint, request, jsonify 
 from app.db import connection
 from app.utils.utils import formater, missing_data, not_found_in_db
 from app.utils.middlewares import veterinarian_check
-from app.db.queries import ADD_FOOD, UPDATE_FOOD, DELETE_FOOD, GET_ALL_FOODS, ADD_EDIBILITY
+from app.db.queries import ADD_FOOD, UPDATE_FOOD, DELETE_FOOD, GET_ALL_FOODS, ADD_EDIBILITY, UPDATE_EDIBILITY
 
 food_bp = Blueprint('foods' , __name__)
 
@@ -129,7 +129,40 @@ def add_edibility():
                  }
                 }), 201            
 
-           
+@food_bp.route('/update_edibility/<int:id>', methods=['POST'])
+@veterinarian_check
+def update_edibility(id):
+    data = request.get_json()
+    edibility_id = id
+
+    required_fields = ["can_eat" , "notes"]
+    missing_data(data , required_fields)
+
+    can_eat = data['can_eat']
+    notes = formater(data["notes"])
+
+    not_found_in_db(edibility_id , "edibility" , "id" , "Edibility id")
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(UPDATE_EDIBILITY, (can_eat , notes, edibility_id,))
+
+            cursor.execute('SELECT * FROM edibility WHERE id = %s' , (edibility_id,))
+            result = cursor.fetchone()
+
+            if not result:
+                return jsonify({"message": "Failed to update edibility."}), 400
+            
+            return jsonify({
+                "message": "Edibility updated successfully.",
+                "food_id": result[1],
+                "animal_id": result[2],
+                "can_eat": result[3],
+                "notes": result[4]
+            }), 201
+
+
+
 
 
     
