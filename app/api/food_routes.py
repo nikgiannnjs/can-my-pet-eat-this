@@ -1,10 +1,10 @@
-#Veterinarians only: get all foods, Update edibility combinations, Update edibility notes
+#Veterinarians only: Update edibility, Delete edibility, Get all edibilities
 
 from flask import Blueprint, request, jsonify 
 from app.db import connection
 from app.utils.utils import formater, missing_data, not_found_in_db
 from app.utils.middlewares import veterinarian_check
-from app.db.queries import ADD_FOOD, UPDATE_FOOD, DELETE_FOOD, GET_ALL_FOODS
+from app.db.queries import ADD_FOOD, UPDATE_FOOD, DELETE_FOOD, GET_ALL_FOODS, ADD_EDIBILITY
 
 food_bp = Blueprint('foods' , __name__)
 
@@ -94,6 +94,42 @@ def get_all_foods():
 
             return jsonify({"foods": foods}), 200
 
+@food_bp.route('/add_edibility', methods=['POST'])
+@veterinarian_check
+def add_edibility():
+    data = request.get_json()
+    required_fields = ["food_id" , "animal_id" , "can_eat" , "notes"]
+    missing_data(data , required_fields)
+
+    food_id = data["food_id"]
+    animal_id = data["animal_id"]
+    can_eat = data["can_eat"]
+    notes = formater(data["notes"])
+
+    not_found_in_db(food_id, "foods" , "id" , "Food id")
+    not_found_in_db(animal_id, "animals" , "id" , "Animal id")
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(ADD_EDIBILITY , (food_id , animal_id, can_eat, notes))
+
+            cursor.execute("SELECT * FROM edibility WHERE food_id = %s AND animal_id = %s", (food_id, animal_id))
+            result = cursor.fetchone()
+
+            if not result:
+                return jsonify({"message": "Failed to add edibility."}), 400
+            
+            return jsonify({
+                "message": "Edibility added successfully.",
+                "edibility": {
+                "food_id": result[1],
+                "animal_id": result[2],
+                "can_eat": result[3],
+                "notes": result[4]
+                 }
+                }), 201            
+
+           
 
 
     
