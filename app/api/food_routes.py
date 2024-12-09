@@ -1,10 +1,10 @@
-#Veterinarians only: Delete edibility, Get all edibilities
+#Veterinarians only: Get all edibilities
 
 from flask import Blueprint, request, jsonify 
 from app.db import connection
 from app.utils.utils import formater, missing_data, not_found_in_db
 from app.utils.middlewares import veterinarian_check
-from app.db.queries import ADD_FOOD, UPDATE_FOOD, DELETE_FOOD, GET_ALL_FOODS, ADD_EDIBILITY, UPDATE_EDIBILITY
+from app.db.queries import ADD_FOOD, UPDATE_FOOD, DELETE_FOOD, GET_ALL_FOODS, ADD_EDIBILITY, UPDATE_EDIBILITY, DELETE_EDIBILITY
 
 food_bp = Blueprint('foods' , __name__)
 
@@ -161,6 +161,21 @@ def update_edibility(id):
                 "notes": result[4]
             }), 201
 
+@food_bp.route('/delete_edibility/<int:id>' , methods=['DELETE'])
+@veterinarian_check
+def delete_edibility(id):
+    edibility_id = id
+    not_found_in_db(edibility_id, "edibility" , "id" , "Edibility id")
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(DELETE_EDIBILITY , (edibility_id,))
+            result = cursor.rowcount
+
+            if not result:
+                return jsonify({"message": "Failed to delete edibility."}), 400
+            
+            return jsonify({"message": "Edibility deleted successfully."}), 201
 
 
 
