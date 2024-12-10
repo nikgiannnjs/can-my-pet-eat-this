@@ -64,7 +64,19 @@ def veterinarian_check(f):
         
         return f(*args, **kwargs)
     return wrapped_vet_function
-                
+
+def valid_token(f):
+    @wraps(f)
+    @jwt_required()
+    def wrapped_function(*args, **kwargs):
+        user_id_from_token = get_jwt_identity()
+        user_id_from_path = kwargs.get("id")
+        
+        if user_id_from_token != str(user_id_from_path):
+            return jsonify({"message": "Unauthorized access. User ID mismatch."}), 403
+        
+        return f(*args, **kwargs)
+    return wrapped_function           
 
 
 

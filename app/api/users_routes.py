@@ -5,7 +5,7 @@ import os
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_mail import Message
-from app.utils.middlewares import admin_check
+from app.utils.middlewares import admin_check, valid_token
 from app.db.queries import USER_REGISTER, DELETE_USER , GET_ALL_USERS , USER_LOGIN, GET_HASHED_PASSWORD, CHANGE_PASSWORD, UPDATE_USERNAME, UPDATE_USER_EMAIL, INSERT_TOS_ACCEPTANCE_STATUS, INSERT_USER_ROLE , GET_COMMON_USER_ROLE_ID, GET_ADMIN_ROLE_ID
 from app.utils.utils import valid_user, formater, missing_data, valid_password, email_is_unique, valid_email_format, duplicate_username,not_found_in_db
 
@@ -100,6 +100,7 @@ def user_login(id):
             return jsonify({"messsage": "Login successfull." , "access_token": token}), 200
         
 @users_bp.route('/change_password/<int:id>' , methods=['POST'])
+@valid_token
 def change_password(id):
     data = request.get_json()
     user_id = id
@@ -146,6 +147,7 @@ def change_password(id):
             return jsonify({"message": "Password updated successfully."}), 200
 
 @users_bp.route('/forgot_password/<int:id>' , methods=['POST'])
+@valid_token
 def forgot_password(id):
     from app import mail
     data = request.get_json()
@@ -216,6 +218,7 @@ def reset_password(token):
             return jsonify({"message": "Password reset successfully."}), 200
 
 @users_bp.route('/change_user_name/<int:id>' , methods=["POST"])
+@valid_token
 def change_user_name(id):
     data = request.get_json()
     valid_user(id)
@@ -241,6 +244,7 @@ def change_user_name(id):
             return jsonify({"message": "Username updated succesfully."}), 201
 
 @users_bp.route("/change_user_email/<int:id>" , methods=["POST"])
+@valid_token
 def change_user_email(id):
     data = request.get_json()
     valid_user(id)

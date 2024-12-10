@@ -1,14 +1,13 @@
-#Premium users only: extra food edibility combinations
-
 from flask import Blueprint, request, jsonify 
 from app.db import connection
 from app.db.queries import INSERT_NEW_PET, GET_ALL_MY_PETS, DELETE_PET, UPDATE_PET, CAN_EAT_THAT, EDIBILITY_NOTE, ADD_ANIMAL, UPDATE_ANIMAL, DELETE_ANIMAL 
 from app.utils.utils import valid_user, formater, if_exists, missing_data, not_found_in_db
-from app.utils.middlewares import admin_check
+from app.utils.middlewares import admin_check, valid_token
 
 pet_bp = Blueprint('pets' , __name__)
 
 @pet_bp.route('/add_new_pet/<int:id>' , methods=['POST'])
+@valid_token
 def insert_pet(id):
     data = request.get_json()
     user_id = id
@@ -36,11 +35,12 @@ def insert_pet(id):
             pet_id = cursor.fetchone()[0]
 
             if not pet_id:
-                return jsonify({"message": "Failed to add pet."})
+                return jsonify({"message": "Failed to add pet."}), 500
             
             return jsonify({"id": pet_id, "message": "New pet succesfully added."}), 201
 
 @pet_bp.route('/all_my_pets/<int:id>' , methods=['GET'])
+@valid_token
 def get_all_my_pets(id):
     user_id = id
 
@@ -67,6 +67,7 @@ def get_all_my_pets(id):
             return jsonify({"pets": users_pets}), 200
     
 @pet_bp.route('/delete_pet/<int:id>', methods=['DELETE'])
+@valid_token
 def delete_pet(id):
     data = request.get_json()
     user_id = id
@@ -91,6 +92,7 @@ def delete_pet(id):
             return jsonify({"message": "Pet deleted succesfully."}), 204
 
 @pet_bp.route('/update_pet_info/<int:id>', methods=['PATCH'])
+@valid_token
 def update_pet_info(id):
     data = request.get_json()
     user_id = id
@@ -131,6 +133,7 @@ def update_pet_info(id):
             return jsonify({"message": "Pet updated successfully.", "new_pet": new_pet}), 200
 
 @pet_bp.route('/is_edible/<int:id>', methods=['GET'])
+@valid_token
 def can_eat_that(id):
     data = request.get_json()
     user_id = id
