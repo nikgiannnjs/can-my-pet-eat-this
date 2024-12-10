@@ -87,7 +87,7 @@ def delete_pet(id):
             result = cursor.rowcount
 
             if not result:
-                return jsonify({"message": f"Failed to delete pet with id:{pet_id}"}), 404
+                return jsonify({"message": "Failed to delete pet."}), 500
             
             return jsonify({"message": "Pet deleted succesfully."}), 204
 
@@ -113,7 +113,7 @@ def update_pet_info(id):
             update_result = cursor.fetchone()[0]
 
             if not update_result:
-                return jsonify({"message": "Failed to update pet information."}), 404
+                return jsonify({"message": "Failed to update pet information."}), 500
             
             cursor.execute('SELECT * FROM pets WHERE id = %s' , (update_result,))
             find_pet_result = cursor.fetchone()
@@ -154,8 +154,9 @@ def can_eat_that(id):
 
             cursor.execute(CAN_EAT_THAT, (food_id, animal_id))
             can_eat = cursor.fetchone()
+            
             if not can_eat:
-                return jsonify({"message": "Edibility data does not exist."}), 400
+                return jsonify({"message": "Edibility data does not exist."}), 404
             can_eat = can_eat[0]
 
             cursor.execute(EDIBILITY_NOTE, (food_id, animal_id))
@@ -189,7 +190,7 @@ def add_animals():
             result = cursor.fetchone()
 
             if not result:
-                return jsonify({"message": "Failed to add animal."}), 400
+                return jsonify({"message": "Failed to add animal."}), 500
             
             return jsonify({"message": "Animal added succesfully."}), 201
 
@@ -212,7 +213,7 @@ def update_animals(id):
             result = cursor.fetchone()
 
             if not result:
-                return jsonify({"message": "Failed to update animal."}), 404
+                return jsonify({"message": "Failed to update animal."}), 500
             
             return jsonify({"message": "Animal updated successsfully."}), 201
 
@@ -229,7 +230,7 @@ def delete_animals(id):
             result = cursor.rowcount
 
             if not result:
-                return jsonify({"message": "Failed to delete animal."}), 400
+                return jsonify({"message": "Failed to delete animal."}), 500
             
             return jsonify({"message": "Animal deleted succesfully."}), 201
 

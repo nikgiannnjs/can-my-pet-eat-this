@@ -31,7 +31,7 @@ def user_register():
     duplicate_username(username)
 
     if password != password_confirm:
-        return jsonify({"message": "Password and password confirmation, are not the same."})
+        return jsonify({"message": "Password and password confirmation, are not the same."}), 400
     
     password_encryption = bcrypt.hashpw(password.encode('utf-8') , bcrypt.gensalt())
     password_hash = password_encryption.decode('utf-8')
@@ -85,7 +85,7 @@ def user_login(id):
             result = cursor.fetchone()
 
             if not result:
-                return jsonify({"message": "Could not retrieve hashed password from database. Check user id."})
+                return jsonify({"message": "Could not retrieve hashed password from database. Check user id."}), 500
             
             password_hash = result[0]
             print (password_hash)
@@ -121,7 +121,7 @@ def change_password(id):
             result = cursor.fetchone()
 
             if not result:
-                return jsonify({"message": "Could not retrieve hashed password from database."}), 404
+                return jsonify({"message": "Could not retrieve hashed password from database."}), 500
             
             password_hash = result[0]
 
@@ -179,7 +179,7 @@ def forgot_password(id):
 
     mail.send(msg)
 
-    return jsonify({"message": "Password reset email sent."})
+    return jsonify({"message": "Password reset email sent."}), 200
         
 @users_bp.route("/reset_password/<token>", methods=['POST'])
 @jwt_required()
@@ -187,9 +187,9 @@ def reset_password(token):
     try:
      user_id = get_jwt_identity()  
     except ExpiredSignatureError:
-        return jsonify({"message": "Token has expired. Request a new password reset."})
+        return jsonify({"message": "Token has expired. Request a new password reset."}), 400
     except InvalidTokenError:
-        return jsonify({"message": "Invalid token. Please request a valid password reset token."})
+        return jsonify({"message": "Invalid token. Please request a valid password reset token."}), 400
 
     data = request.get_json()
 
@@ -213,7 +213,7 @@ def reset_password(token):
             password_update_result = cursor.fetchone()
 
             if not password_update_result:
-                return jsonify({"message": "Could not reset password."}), 404
+                return jsonify({"message": "Could not reset password."}), 500
             
             return jsonify({"message": "Password reset successfully."}), 200
 
@@ -239,7 +239,7 @@ def change_user_name(id):
             result = cursor.fetchone()
 
             if not result:
-                return jsonify({"message": "Could not update username."}), 400
+                return jsonify({"message": "Could not update username."}), 500
             
             return jsonify({"message": "Username updated succesfully."}), 201
 
@@ -263,7 +263,7 @@ def change_user_email(id):
             result = cursor.fetchone()
 
             if not result:
-                return jsonify({"message": "Could not update user email."}), 400
+                return jsonify({"message": "Could not update user email."}), 404
             
             return jsonify({"message": "User email updated successfully."}), 201
 

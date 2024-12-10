@@ -12,9 +12,9 @@ def admin_check(f):
         try:
          user_id = get_jwt_identity()  
         except ExpiredSignatureError:
-         return jsonify({"message": "Token has expired. Request a new password reset."})
+         return jsonify({"message": "Token has expired. Request a new password reset."}), 400
         except InvalidTokenError:
-         return jsonify({"message": "Invalid token. Please request a valid password reset token."})
+         return jsonify({"message": "Invalid token. Please request a valid password reset token."}), 400
 
         with connection:
             with connection.cursor() as cursor:
@@ -42,9 +42,9 @@ def veterinarian_check(f):
         try:
          user_id = get_jwt_identity()  
         except ExpiredSignatureError:
-         return jsonify({"message": "Token has expired. Request a new password reset."})
+         return jsonify({"message": "Token has expired. Request a new password reset."}), 400
         except InvalidTokenError:
-         return jsonify({"message": "Invalid token. Please request a valid password reset token."})
+         return jsonify({"message": "Invalid token. Please request a valid password reset token."}), 400
 
         with connection:
             with connection.cursor() as cursor:
@@ -52,7 +52,7 @@ def veterinarian_check(f):
                 result = cursor.fetchone()
 
                 if not result:
-                    return jsonify({"message": "Veterinarian id not found."})
+                    return jsonify({"message": "Veterinarian id not found."}), 400
                 
                 vet_id = result[0]
 
@@ -73,7 +73,7 @@ def valid_token(f):
         user_id_from_path = kwargs.get("id")
         
         if user_id_from_token != str(user_id_from_path):
-            return jsonify({"message": "Unauthorized access. User ID mismatch."}), 403
+            return jsonify({"message": "Unauthorized access. User ID mismatch."}), 400
         
         return f(*args, **kwargs)
     return wrapped_function           
