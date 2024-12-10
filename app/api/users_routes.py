@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.db import connection
 import bcrypt
 import os
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, create_refresh_token
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from flask_mail import Message
 from app.utils.middlewares import admin_check, valid_token
@@ -95,9 +95,21 @@ def user_login(id):
             if not comparison:
                 return jsonify({"message": "Invalid password."}), 400
             
-            token = create_access_token(identity=str(user_id), additional_claims={"user_id": user_id})
+            access_token = create_access_token(identity=str(user_id), additional_claims={"user_id": user_id})
+            refresh_token = create_refresh_token(identity=str(user_id), additional_claims={"user_id": user_id})
             
-            return jsonify({"messsage": "Login successfull." , "access_token": token}), 200
+            return jsonify({"messsage": "Login successfull." , "access_token": access_token , "refresh_token":refresh_token}), 200
+
+@users_bp.route('/refresh_token', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh_token():
+    current_user = get_jwt_identity()
+    new_access_token = create_access_token(identity=str(current_user))
+
+    return jsonify({
+        "message": "Access token refreshed successfully.",
+        "access_token": new_access_token,
+        }), 200   
         
 @users_bp.route('/change_password/<int:id>' , methods=['POST'])
 @valid_token

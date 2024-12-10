@@ -17,7 +17,8 @@ def create_app():
     app = Flask(__name__)
 
     app.config["JWT_SECRET_KEY"] = os.getenv("MY_JWT_SECRET_KEY")
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=15)
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=7)
 
     #app.config["MAIL_SERVER"] = 'smtp.gmail.com'
     app.config["MAIL_SERVER"] = 'smtp.mailtrap.io'
