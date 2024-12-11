@@ -155,7 +155,7 @@ A user creates their profile by providing a first name, last name, email, and pa
   ```json
   {
     "version": "tos_version ",
-    "status": boolean
+    "status": "boolean"
   }
   ```
   
@@ -164,8 +164,8 @@ A user creates their profile by providing a first name, last name, email, and pa
 
   ```json
   {
-    "user_id": user_id_to_be_assigned_role,
-    "role_id": role_id
+    "user_id": "user_id_to_be_assigned_role",
+    "role_id": "role_id"
   }
   ```
   
@@ -177,7 +177,7 @@ A user creates their profile by providing a first name, last name, email, and pa
 
   ```json
   {
-    "user_id": user_to_be_deleted_id
+    "user_id": "user_to_be_deleted_id"
   }
   ```
   
@@ -189,8 +189,8 @@ A user creates their profile by providing a first name, last name, email, and pa
   ```json
   {
     "pet_name": "pet_name",
-    "pet_weight": pet_weight,
-    "animal_id": animal_id(species)
+    "pet_weight": "pet_weight",
+    "animal_id": "animal_id(species)"
   }
   ```
 
@@ -205,10 +205,10 @@ A user creates their profile by providing a first name, last name, email, and pa
 
   ```json
   {
-    "id": pet_id,
+    "id": "pet_id",
     "pet_name": "pet_name",
-    "pet_weight": weight,
-    "animal_id": animal_id(species)
+    "pet_weight": "weight",
+    "animal_id": "animal_id(species)"
   }
   ```
 
@@ -217,8 +217,8 @@ A user creates their profile by providing a first name, last name, email, and pa
 
   ```json
   {
-    "pet_id": pet_id,
-    "food_id": food_id
+    "pet_id": "pet_id",
+    "food_id": "food_id"
   }
   ```
 
@@ -281,7 +281,7 @@ A user creates their profile by providing a first name, last name, email, and pa
 
   ```json
   {
-    "can_eat": boolean,
+    "can_eat": "boolean",
     "notes": "Demo text."
   }
   ```
@@ -291,9 +291,9 @@ A user creates their profile by providing a first name, last name, email, and pa
 
   ```json
   {
-    "food_id": food_id,
-    "animal_id": animal_id,
-    "can_eat": boolean,
+    "food_id": "food_id",
+    "animal_id": "animal_id",
+    "can_eat": "boolean",
     "notes": "Demo text."
   }
   ```
